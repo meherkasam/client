@@ -1,6 +1,7 @@
 import java.io.*;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.io.PrintStream;
 
 /**
  * 
@@ -27,7 +28,9 @@ public class CommandExecuter {
 			clientId = new BigInteger(130, keyGen).toString(32);
 			clientRoot += "clientdir-" + clientId + "/";
 			new File(clientRoot).mkdir();
-			log = new PrintStream(clientRoot + "data.log");
+			File myFile = new File(clientRoot + "data.log");
+			//log = new PrintStream(myFile);
+			log = new PrintStream(new FileOutputStream(myFile));
 		}
 		catch(Exception e){
 			System.out.println(e);
