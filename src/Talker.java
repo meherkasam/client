@@ -20,6 +20,7 @@ public class Talker {
 	static String clientHostName = null;
 	static String serverHost = null;
 	static int serverPort = 0;
+	static int livenessPort = 0;
 	static String command = null;
 	public Talker() {
 		DataObject input = null, output = null;
@@ -201,6 +202,12 @@ public class Talker {
 			params = configLine.split(" ");
 			if(params[0].compareToIgnoreCase("chunk-size:") == 0) {
 				CommandExecuter.chunkSize = Integer.parseInt(params[1]);
+			}
+			
+			configLine = configFile.readLine();
+			params = configLine.split(" ");
+			if(params[0].compareToIgnoreCase("liveness-port:") == 0) {
+				livenessPort = Integer.parseInt(params[1]);
 			}
 			else
 				return false;

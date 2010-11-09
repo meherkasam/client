@@ -40,7 +40,7 @@ public class CommandExecuter {
 		reqNo++;
 		a.reqNo = reqNo;
 		a.clientId = clientId;
-		a.message = "Req Hello " + String.valueOf(a.reqNo);
+		a.message = "Req Hello " + Talker.livenessPort + " " + String.valueOf(a.reqNo);
 		Write(a);
 		a = Read(a);
 		return a;
