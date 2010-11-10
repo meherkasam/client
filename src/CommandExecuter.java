@@ -20,13 +20,13 @@ public class CommandExecuter {
 	static String clientRoot = "./"; 
 	static PrintStream log = null;
 	static int reqNo = 0;
-	static String clientId = "";
+	static String senderId = "";
 	public CommandExecuter() {
 		try {
 			reqNo = 0;
 			SecureRandom keyGen = new SecureRandom();
-			clientId = new BigInteger(130, keyGen).toString(32);
-			clientRoot += "clientdir-" + clientId + "/";
+			senderId = new BigInteger(130, keyGen).toString(32);
+			clientRoot += "clientdir-" + senderId + "/";
 			new File(clientRoot).mkdir();
 			File myFile = new File(clientRoot + "data.log");
 			//log = new PrintStream(myFile);
@@ -39,15 +39,15 @@ public class CommandExecuter {
 	static DataObject Hello(DataObject a) {
 		reqNo++;
 		a.reqNo = reqNo;
-		a.clientId = clientId;
-		a.message = "Req Hello " + Talker.livenessPort + " " + String.valueOf(a.reqNo);
+		a.senderId = senderId;
+		a.message = "Req Hello " + String.valueOf(a.reqNo) + " " + Talker.livenessPort;
 		Write(a);
 		a = Read(a);
 		return a;
 	}
 	static DataObject Bye(DataObject a) {
 		a.message = "Req Bye";
-		a.clientId = clientId;
+		a.senderId = senderId;
 		Write(a);
 		a = Read(a);
 		log.flush();
@@ -57,7 +57,7 @@ public class CommandExecuter {
 	static DataObject List(DataObject a, int start, int max, int priority) {
 		reqNo++;
 		a.reqNo = reqNo;
-		a.clientId = clientId;
+		a.senderId = senderId;
 		a.message = "Req List " + String.valueOf(a.reqNo) + " " + Integer.toString(start) + " " + Integer.toString(max) + " " + Integer.toString(priority);
 		Write(a);
 		a = Read(a);
@@ -66,7 +66,7 @@ public class CommandExecuter {
 	static DataObject Get(DataObject a, String fileName, int priority, int limit) {
 		reqNo++;
 		a.reqNo = reqNo;
-		a.clientId = clientId;
+		a.senderId = senderId;
 		//if(limit == 0)
 			a.message = "Req Get " + String.valueOf(a.reqNo) + " " + fileName + " " + priority;
 		//else
@@ -78,7 +78,7 @@ public class CommandExecuter {
 	static DataObject Put(DataObject a, String fileName, int priority, int limit) {
 		reqNo++;
 		a.reqNo = reqNo;
-		a.clientId = clientId;
+		a.senderId = senderId;
 		//if(limit == 0)
 			a.message = "Req Put " + String.valueOf(a.reqNo) + " " + fileName + " " + priority;
 		//else
@@ -96,7 +96,7 @@ public class CommandExecuter {
 			FileOutputStream os = new FileOutputStream(clientRoot + fileName);
 			while(notLast){
 				currentChunk++;
-				a.clientId = clientId;
+				a.senderId = senderId;
 				a.message = "Req Pull " + String.valueOf(a.reqNo) + " " + fileId + " " + (offset) + " " + chunkSize*KB2B;
 				Write(a);
 				a = Read(a);
@@ -122,7 +122,7 @@ public class CommandExecuter {
 	static DataObject Delete(DataObject a, String fileName, int priority) {
 		reqNo++;
 		a.reqNo = reqNo;
-		a.clientId = clientId;
+		a.senderId = senderId;
 		a.message = "Req Delete " + String.valueOf(a.reqNo) + " " + fileName + " " + priority;
 		Write(a);
 		a = Read(a);
@@ -138,7 +138,7 @@ public class CommandExecuter {
 			FileInputStream is = new FileInputStream(clientRoot + fileName);
 			while(notLast) {
 				currentChunk++;
-				a.clientId = clientId;
+				a.senderId = senderId;
 				a.message = "Req Push " + String.valueOf(a.reqNo) + " " + fileId;
 				int length = is.read(a.data, 0, chunkSize*KB2B);
 				a.length = length;
