@@ -69,11 +69,11 @@ public class Talker {
 			    			params = message.split(" ");
 			    			input = new DataObject(0);
 			    			output = new DataObject(0);
-			    			input = CommandExecuter.Pull(output, params[5], fileName, 0);
+			    			/*input = CommandExecuter.Pull(output, params[5], fileName, 0);
 			    			if (input.success)
 			    				System.out.println("Get file " + fileName + " successful\n");
 			    			else
-			    				System.out.println("Error getting " + fileName + "\n");
+			    				System.out.println("Error getting " + fileName + "\n");*/
 			    		}
 			    		else {
 			    			System.out.println("Error getting " + fileName + "\n");
