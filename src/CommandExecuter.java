@@ -75,6 +75,15 @@ public class CommandExecuter {
 		a = Read(a);
 	    return a;
 	}
+	static DataObject GetDone(DataObject a) {
+		reqNo++;
+		a.reqNo = reqNo;
+		a.senderId = senderId;
+		a.message = "Req Getdone " + String.valueOf(a.reqNo);
+		Write(a);
+		a = Read(a);
+		return a;
+	}
 	static DataObject Put(DataObject a, String fileName, int priority, int limit) {
 		reqNo++;
 		a.reqNo = reqNo;
@@ -87,19 +96,28 @@ public class CommandExecuter {
 		a = Read(a);
 	    return a;
 	}
-	static DataObject Pull(DataObject a, String fileId, String fileName, int limit) {
+	static DataObject PutDone(DataObject a) {
+		reqNo++;
+		a.reqNo = reqNo;
+		a.senderId = senderId;
+		a.message = "Req Putdone " + String.valueOf(a.reqNo);
+		Write(a);
+		a = Read(a);
+		return a;
+	}
+	static DataObject Pull(DataObject a, String fileName, int limit, ObjectOutputStream fsos, ObjectInputStream fsis) {
 		//reqNo++;
 		a.reqNo = reqNo;
 		boolean notLast = true;
 		int offset = 0, currentChunk = 0;
 		try {
 			FileOutputStream os = new FileOutputStream(clientRoot + fileName);
-			while(notLast){
+			while(notLast) {
 				currentChunk++;
 				a.senderId = senderId;
-				a.message = "Req Pull " + String.valueOf(a.reqNo) + " " + fileId + " " + (offset) + " " + chunkSize*KB2B;
-				Write(a);
-				a = Read(a);
+				a.message = "Req Pull " + String.valueOf(a.reqNo) + " " + fileName + " " + (offset) + " " + chunkSize*KB2B;
+				Write(fsos, a);
+				a = Read(fsis, a);
 				if(a.success)
 				{
 					os.write(a.data, 0, a.length-1);
@@ -128,7 +146,7 @@ public class CommandExecuter {
 		a = Read(a);
 	    return a;
 	}
-	static DataObject Push(DataObject a, String fileId, String fileName, int limit) {
+	static DataObject Push(DataObject a, String fileName, int limit, ObjectOutputStream fsos, ObjectInputStream fsis) {
 		//reqNo++;
 		a.reqNo = reqNo;
 		int offset = 0;
@@ -139,7 +157,7 @@ public class CommandExecuter {
 			while(notLast) {
 				currentChunk++;
 				a.senderId = senderId;
-				a.message = "Req Push " + String.valueOf(a.reqNo) + " " + fileId;
+				a.message = "Req Push " + String.valueOf(a.reqNo) + " " + fileName;
 				int length = is.read(a.data, 0, chunkSize*KB2B);
 				a.length = length;
 				if(length < chunkSize * KB2B  || currentChunk == limit) {
@@ -155,8 +173,8 @@ public class CommandExecuter {
 				if(notLast) {
 					offset += a.length;
 				}
-				Write(a);
-				a = Read(a);
+				Write(fsos, a);
+				a = Read(fsis, a);
 			}
 			is.close();
 		}
@@ -187,6 +205,28 @@ public class CommandExecuter {
 		try {
 			input = (DataObject) Talker.is.readObject();
 			log.println(input.message);
+		}
+		catch(Exception E) {
+			
+		}
+		return input;
+	}
+	static void Write(ObjectOutputStream os, DataObject output) {
+		try {
+			os.writeObject(output);
+			os.flush();
+			log.println(output.message);
+			log.flush();
+		}
+		catch(Exception E) {
+			
+		}
+	}
+	static DataObject Read(ObjectInputStream is, DataObject input) {
+		try {
+			input = (DataObject) is.readObject();
+			log.println(input.message);
+			log.flush();
 		}
 		catch(Exception E) {
 			

@@ -64,22 +64,31 @@ public class Talker {
 			    		output = new DataObject(0);
 			    		String fileName = params[2];
 			    		input = CommandExecuter.Get(output, fileName, Integer.parseInt(params[3]), 0);
-			    		if(input.success){
+			    		if(input.success) {
 			    			String message = input.message;
 			    			params = message.split(" ");
 			    			input = new DataObject(0);
 			    			output = new DataObject(0);
-			    			/*input = CommandExecuter.Pull(output, params[5], fileName, 0);
+			    			String fileServerIP = params[5];
+			    			int fileServerPort = Integer.parseInt(params[6]);
+			    			InetAddress fileServerAddress = InetAddress.getByName(fileServerIP);
+			    			Socket fileServerSocket = new Socket(fileServerAddress, fileServerPort);
+			    			ObjectOutputStream fos = new ObjectOutputStream(fileServerSocket.getOutputStream());
+			    			ObjectInputStream fis = new ObjectInputStream(fileServerSocket.getInputStream());
+			    			input = CommandExecuter.Pull(output, fileName, 0, fos, fis);
 			    			if (input.success)
 			    				System.out.println("Get file " + fileName + " successful\n");
 			    			else
-			    				System.out.println("Error getting " + fileName + "\n");*/
+			    				System.out.println("Error getting " + fileName + "\n");
+			    			fos.close();
+			    			fis.close();
+			    			input = CommandExecuter.GetDone(output);
 			    		}
 			    		else {
 			    			System.out.println("Error getting " + fileName + "\n");
 			    		}
 					}
-					else if (params[1].compareToIgnoreCase("AGET") == 0) {
+					/*else if (params[1].compareToIgnoreCase("AGET") == 0) {
 						input = new DataObject(0);
 			    		output = new DataObject(0);
 			    		String fileName = params[2];
@@ -90,7 +99,7 @@ public class Talker {
 			    			params = message.split(" ");
 			    			input = new DataObject(0);
 			    			output = new DataObject(0);
-			    			input = CommandExecuter.Pull(output, params[5], fileName, limit);
+			    			//input = CommandExecuter.Pull(output, fileName, limit, fos, fis);
 			    			if(input.success)
 			    				System.out.println("Aget file " + fileName + " successful\n");
 			    			else
@@ -99,7 +108,7 @@ public class Talker {
 			    		else {
 			    			System.out.println("Error getting " + fileName + "\n");
 			    		}
-					}
+					}*/
 					else if (params[1].compareToIgnoreCase("PUT") == 0) {
 						input = new DataObject(0);
 			    		output = new DataObject(0);
@@ -124,17 +133,26 @@ public class Talker {
 			    			params = message.split(" ");
 			    			input = new DataObject(0);
 			    			output = new DataObject(CommandExecuter.chunkSize);
-			    			input = CommandExecuter.Push(output, params[5], fileName, 0);
+			    			String fileServerIP = params[5];
+			    			int fileServerPort = Integer.parseInt(params[6]);
+			    			InetAddress fileServerAddress = InetAddress.getByName(fileServerIP);
+			    			Socket fileServerSocket = new Socket(fileServerAddress, fileServerPort);
+			    			ObjectOutputStream fos = new ObjectOutputStream(fileServerSocket.getOutputStream());
+			    			ObjectInputStream fis = new ObjectInputStream(fileServerSocket.getInputStream());
+			    			input = CommandExecuter.Push(output, fileName, 0, fos, fis);
 			    			if (input.success)
 			    				System.out.println("Put file " + fileName + " successful\n");
 			    			else
 			    				System.out.println("Error putting " + fileName + "\n");
+			    			fos.close();
+			    			fis.close();
+			    			input = CommandExecuter.GetDone(output);
 			    		}
 			    		else {
 			    			System.out.println("Error putting " + fileName + "\n");
 			    		}
 					}
-					else if (params[1].compareToIgnoreCase("APUT") == 0) {
+					/*else if (params[1].compareToIgnoreCase("APUT") == 0) {
 						input = new DataObject(0);
 			    		output = new DataObject(0);
 			    		String fileName = params[2];
@@ -145,7 +163,7 @@ public class Talker {
 			    			params = message.split(" ");
 			    			input = new DataObject(0);
 			    			output = new DataObject(CommandExecuter.chunkSize);
-			    			input = CommandExecuter.Push(output, params[5], fileName, limit);
+			    			//input = CommandExecuter.Push(output, params[5], fileName, limit);
 			    			if(input.success)
 			    				System.out.println("Aput file " + fileName + " successful\n");
 			    			else
@@ -154,7 +172,7 @@ public class Talker {
 			    		else {
 			    			System.out.println("Error putting " + fileName + "\n");
 			    		}
-					}
+					}*/
 					else if (params[1].compareToIgnoreCase("DELETE") == 0) {
 						input = new DataObject(0);
 			    		output = new DataObject(0);
