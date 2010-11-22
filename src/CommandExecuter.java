@@ -75,11 +75,11 @@ public class CommandExecuter {
 		a = Read(a);
 	    return a;
 	}
-	static DataObject GetDone(DataObject a) {
+	static DataObject GetDone(DataObject a, String fileName) {
 		reqNo++;
 		a.reqNo = reqNo;
 		a.senderId = senderId;
-		a.message = "Req Getdone " + String.valueOf(a.reqNo);
+		a.message = "Req Getdone " + fileName + " " + String.valueOf(a.reqNo);
 		Write(a);
 		a = Read(a);
 		return a;
@@ -96,11 +96,11 @@ public class CommandExecuter {
 		a = Read(a);
 	    return a;
 	}
-	static DataObject PutDone(DataObject a) {
+	static DataObject PutDone(DataObject a, String fileName) {
 		reqNo++;
 		a.reqNo = reqNo;
 		a.senderId = senderId;
-		a.message = "Req Putdone " + String.valueOf(a.reqNo);
+		a.message = "Req Putdone " + fileName + " " + String.valueOf(a.reqNo);
 		Write(a);
 		a = Read(a);
 		return a;

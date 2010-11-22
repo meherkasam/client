@@ -37,15 +37,16 @@ public class Talker {
 			is = new ObjectInputStream(serverSocket.getInputStream());
 			
 			consoleInput = new BufferedReader(new InputStreamReader(System.in));
+			input = new DataObject(0);
+    		output = new DataObject(0);
+			input = CommandExecuter.Hello(output);
+			System.out.println("Hello from server\n");
 			while((command = consoleInput.readLine()) != null ) {
 				String[] params = command.split(" ");
-				if (params[0].compareToIgnoreCase("HELLO") == 0) {
-					input = new DataObject(0);
-		    		output = new DataObject(0);
-					input = CommandExecuter.Hello(output);
-					System.out.println("Hello from server\n");
-				}
-				else if (params[0].compareToIgnoreCase("BYE") == 0 || params[0].compareToIgnoreCase("TERMINATE") == 0) {
+				/*if (params[0].compareToIgnoreCase("HELLO") == 0) {
+					
+				}*/
+				if (params[0].compareToIgnoreCase("BYE") == 0 || params[0].compareToIgnoreCase("TERMINATE") == 0) {
 					input = new DataObject(0);
 		    		output = new DataObject(0);
 		    		input = CommandExecuter.Bye(output);
@@ -82,7 +83,7 @@ public class Talker {
 			    				System.out.println("Error getting " + fileName + "\n");
 			    			fos.close();
 			    			fis.close();
-			    			input = CommandExecuter.GetDone(output);
+			    			input = CommandExecuter.GetDone(output, fileName);
 			    		}
 			    		else {
 			    			System.out.println("Error getting " + fileName + "\n");
@@ -146,7 +147,7 @@ public class Talker {
 			    				System.out.println("Error putting " + fileName + "\n");
 			    			fos.close();
 			    			fis.close();
-			    			input = CommandExecuter.GetDone(output);
+			    			input = CommandExecuter.PutDone(output, fileName);
 			    		}
 			    		else {
 			    			System.out.println("Error putting " + fileName + "\n");
