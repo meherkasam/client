@@ -40,8 +40,7 @@ public class CommandExecuter {
 		reqNo++;
 		a.reqNo = reqNo;
 		a.senderId = senderId;
-		a.message = "Req Hello " + String.valueOf(a.reqNo) + " "
-				+ Talker.livenessPort;
+		a.message = "Req Hello " + String.valueOf(a.reqNo);
 		Write(a);
 		a = Read(a);
 		return a;
@@ -61,9 +60,8 @@ public class CommandExecuter {
 		reqNo++;
 		a.reqNo = reqNo;
 		a.senderId = senderId;
-		a.message = "Req List " + String.valueOf(a.reqNo) + " "
-				+ Integer.toString(start) + " " + Integer.toString(max) + " "
-				+ Integer.toString(priority);
+		String message = Integer.toString(start) + " " + Integer.toString(max) + " " + Integer.toString(priority);
+		a.message = "Req List " + String.valueOf(a.reqNo) + " " + message;
 		Write(a);
 		a = Read(a);
 		return a;
