@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import javax.net.ssl.*;
 
 /**
  * 
@@ -32,7 +33,9 @@ public class Talker {
 			}
 			
 			InetAddress serverAddress = InetAddress.getByName(serverHost);
-			Socket serverSocket = new Socket(serverAddress, serverPort);
+			SSLSocketFactory f = (SSLSocketFactory) SSLSocketFactory.getDefault();
+			SSLSocket serverSocket = (SSLSocket) f.createSocket(serverAddress, serverPort);
+			serverSocket.setEnabledCipherSuites(serverSocket.getSupportedCipherSuites());
 			os = new ObjectOutputStream(serverSocket.getOutputStream());
 			is = new ObjectInputStream(serverSocket.getInputStream());
 			
@@ -64,28 +67,41 @@ public class Talker {
 						input = new DataObject(0);
 			    		output = new DataObject(0);
 			    		String fileName = params[2];
-			    		input = CommandExecuter.Get(output, fileName, Integer.parseInt(params[3]), 0);
-			    		if(input.success) {
-			    			String message = input.message;
-			    			params = message.split(" ");
-			    			input = new DataObject(0);
-			    			output = new DataObject(0);
-			    			String fileServerIP = params[5];
-			    			int fileServerPort = Integer.parseInt(params[6]);
-			    			InetAddress fileServerAddress = InetAddress.getByName(fileServerIP);
-			    			Socket fileServerSocket = new Socket(fileServerAddress, fileServerPort);
-			    			ObjectOutputStream fos = new ObjectOutputStream(fileServerSocket.getOutputStream());
-			    			ObjectInputStream fis = new ObjectInputStream(fileServerSocket.getInputStream());
-			    			input = CommandExecuter.Pull(output, fileName, 0, fos, fis);
-			    			if (input.success)
-			    				System.out.println("Get file " + fileName + " successful\n");
-			    			else
-			    				System.out.println("Error getting " + fileName + "\n");
-			    			fos.close();
-			    			fis.close();
-			    			input = CommandExecuter.GetDone(output, fileName);
+			    		boolean done = false;
+			    		int tempPriority = Integer.parseInt(params[3]);
+			    		while(!done) {
+				    		input = CommandExecuter.Get(output, fileName, tempPriority, 0);
+				    		if(input.success) {
+				    			String message = input.message;
+				    			params = message.split(" ");
+				    			input = new DataObject(0);
+				    			output = new DataObject(0);
+				    			String fileServerIP = params[5];
+				    			int fileServerPort = Integer.parseInt(params[6]);
+				    			InetAddress fileServerAddress = InetAddress.getByName(fileServerIP);
+				    			try {
+					    			SSLSocketFactory g = (SSLSocketFactory) SSLSocketFactory.getDefault();
+					    			SSLSocket fileServerSocket = (SSLSocket) g.createSocket(fileServerAddress, fileServerPort);
+					    			fileServerSocket.setEnabledCipherSuites(fileServerSocket.getSupportedCipherSuites());
+					    			ObjectOutputStream fos = new ObjectOutputStream(fileServerSocket.getOutputStream());
+					    			ObjectInputStream fis = new ObjectInputStream(fileServerSocket.getInputStream());
+					    			boolean status = CommandExecuter.Pull(output, fileName, 0, fos, fis);
+					    			if (status) {
+					    				System.out.println("Get file " + fileName + " successful\n");
+					    				input = CommandExecuter.GetDone(output, fileName);
+					    				done = true;
+					    			}
+					    			fos.close();
+					    			fis.close();
+				    			}
+				    			catch (Exception e) {
+				    				System.out.println("Connection issues");
+				    			}
+				    		}
+				    		else
+				    			break;
 			    		}
-			    		else {
+			    		if(!done){
 			    			System.out.println("Error getting " + fileName + "\n");
 			    		}
 					}
@@ -134,20 +150,18 @@ public class Talker {
 			    			params = message.split(" ");
 			    			input = new DataObject(0);
 			    			output = new DataObject(CommandExecuter.chunkSize);
-			    			String fileServerIP = params[5];
+			    			/*String fileServerIP = params[5];
 			    			int fileServerPort = Integer.parseInt(params[6]);
 			    			InetAddress fileServerAddress = InetAddress.getByName(fileServerIP);
 			    			Socket fileServerSocket = new Socket(fileServerAddress, fileServerPort);
 			    			ObjectOutputStream fos = new ObjectOutputStream(fileServerSocket.getOutputStream());
-			    			ObjectInputStream fis = new ObjectInputStream(fileServerSocket.getInputStream());
-			    			input = CommandExecuter.Push(output, fileName, 0, fos, fis);
+			    			ObjectInputStream fis = new ObjectInputStream(fileServerSocket.getInputStream());*/
+			    			input = CommandExecuter.Push(output, fileName, 0);
 			    			if (input.success)
 			    				System.out.println("Put file " + fileName + " successful\n");
 			    			else
 			    				System.out.println("Error putting " + fileName + "\n");
-			    			fos.close();
-			    			fis.close();
-			    			input = CommandExecuter.PutDone(output, fileName);
+			    			//input = CommandExecuter.PutDone(output, fileName);
 			    		}
 			    		else {
 			    			System.out.println("Error putting " + fileName + "\n");
